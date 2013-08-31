@@ -10,6 +10,10 @@ def self.iterations
   200
 end
 
+def self.header
+  puts "                     USER      SYSTEM     TOTAL        REAL"
+end
+
 def self.bench name, command
   print " -- #{name.ljust(11)} :"
   puts Benchmark.measure {
@@ -38,16 +42,17 @@ begin
   BASH_SOCKET
 
   interpreters = {
-    bash: %q{bash -c 'exit'},
+    bash:        %q{bash -c 'exit'},
     bash_socket: bash_socket,
-    perl: %q{perl -e 'exit'},
-    python: %q{python -c 'exit'},
-    node: %q{node -e "process.exit()"},
-    io: %q{io -e 'exit'},
-    coffee: %q{coffee -e "process.exit()"},
-    ruby: %q{ruby -e 'exit'}
+    perl:        %q{perl -e 'exit'},
+    python:      %q{python -c 'exit'},
+    node:        %q{node -e "process.exit()"},
+    coffee:      %q{coffee -e "process.exit()"},
+    io:          %q{io -e 'exit'},
+    ruby:        %q{ruby -e 'exit'}
   }
 
+  header
   interpreters.each do |name, command|
     bench name.to_s, command
   end
