@@ -52,6 +52,7 @@ begin
     python:      %q{python -c 'exit'},
     node:        %q{node -e "process.exit()"},
     io:          %q{io -e 'exit'},
+    ren_c:       %q{ren-c --do 'quit'},
     ruby:        %q{ruby -e 'exit'}
   }
 
