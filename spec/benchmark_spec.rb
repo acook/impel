@@ -42,12 +42,15 @@ begin
   BASH_SOCKET
 
   interpreters = {
+    luajit:      %q{luajit -e 'os.exit()'},
+    lua:         %q{lua -e 'os.exit()'},
     bash:        %q{bash -c 'exit'},
     bash_socket: bash_socket,
+    rebol3:      %q{r3 --do 'quit'},
+    blacklight:  %q{blacklight -e 'quit'},
     perl:        %q{perl -e 'exit'},
     python:      %q{python -c 'exit'},
     node:        %q{node -e "process.exit()"},
-    coffee:      %q{coffee -e "process.exit()"},
     io:          %q{io -e 'exit'},
     ruby:        %q{ruby -e 'exit'}
   }
