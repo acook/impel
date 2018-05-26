@@ -48,16 +48,19 @@ begin
 
   interpreters = {
     luajit:      %q{luajit -e 'os.exit()'},
+    blacklight:  %q{blacklight -e '@'},
     lua:         %q{lua -e 'os.exit()'},
     bash:        %q{bash -c 'exit'},
-    bash_socket: bash_socket,
+    #bash_socket: bash_socket,
     perl:        %q{perl -e 'exit'},
-    blacklight:  %q{blacklight -e 'quit'},
-    rebol3:      %q{r3 --do 'quit'},
+    mruby:       %q{mruby -e 'Array.new'},
     python:      %q{python -c 'exit'},
-    node:        %q{node -e "process.exit()"},
-    io:          %q{io -e 'exit'},
+    rebol2:      %q{rebol2 -q --do 'quit'},
+    nodejs:      %q{nodejs -e "process.exit()"},
+    #atronix:     %q{r3-atronix --do 'quit'},
     ren_c:       %q{ren-c --do 'quit'},
+    rebol3:      %q{r3 --do 'quit'},
+    io:          %q{io -e 'exit'},
     ruby:        %q{ruby -e 'exit'}
   }
 
