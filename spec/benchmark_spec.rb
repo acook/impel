@@ -1,6 +1,7 @@
 require_relative 'spec_helper'
 
 require 'benchmark'
+require 'socket'
 
 spec 'running benchmarks' do
   true
@@ -15,14 +16,18 @@ def self.header
 end
 
 def self.bench name, command
+  output = nil
   print " -- #{name.ljust(11)} :"
-  puts Benchmark.measure {
+  print Benchmark.measure {
     iterations.times do
-      run command
+      _, output = run command
     end
   }
+  out = output.stdout.strip + output.stderr.strip
+  puts out unless out.empty?
 end
 
+Dir.mkdir './tmp' unless File.exists? './tmp'
 file = './tmp/benchmark.sock'
 File.delete(file) if File.exists?(file) && File.socket?(file)
 

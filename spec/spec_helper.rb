@@ -4,6 +4,7 @@ Bundler.require :test
 require 'uspec'
 extend Uspec
 
+module Uspec::DSL
 def self.run *args
   output = Struct.new :pid, :stdout, :stderr
 
@@ -13,4 +14,4 @@ def self.run *args
 
   [status, output]
 end
-
+end
