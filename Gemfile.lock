@@ -1,8 +1,8 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    open4 (1.3.0)
-    uspec (0.0.1)
+    open4 (1.3.4)
+    uspec (0.1.0)
 
 PLATFORMS
   ruby
@@ -10,3 +10,6 @@ PLATFORMS
 DEPENDENCIES
   open4
   uspec
+
+BUNDLED WITH
+   1.16.2
