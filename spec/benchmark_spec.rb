@@ -56,12 +56,11 @@ begin
     mruby:       %q{mruby -e 'Array.new'},
     python:      %q{python -c 'exit'},
     rebol2:      %q{rebol2 -q --do 'quit'},
-    nodejs:      %q{nodejs -e "process.exit()"},
-    #atronix:     %q{r3-atronix --do 'quit'},
-    ren_c:       %q{ren-c --do 'quit'},
+    nodejs:      %q{node -e "process.exit()"},
     rebol3:      %q{r3 --do 'quit'},
-    io:          %q{io -e 'exit'},
-    ruby:        %q{ruby -e 'exit'}
+    ruby:        %q{ruby -e 'exit'},
+    erlang:      %q{erl -noshell -eval 'halt(0).'},
+    elixir:      %q{elixir -e 'System.halt(0)'},
   }
 
   header
