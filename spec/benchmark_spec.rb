@@ -27,9 +27,9 @@ def self.bench name, command
   puts out unless out.empty?
 end
 
-Dir.mkdir './tmp' unless File.exists? './tmp'
+Dir.mkdir './tmp' unless File.exist? './tmp'
 file = './tmp/benchmark.sock'
-File.delete(file) if File.exists?(file) && File.socket?(file)
+File.delete(file) if File.exist?(file) && File.socket?(file)
 
 server = UNIXServer.new(file)
 #socket = server.accept
@@ -71,5 +71,5 @@ begin
 
 ensure
   server.close
-  File.delete(file) if File.exists?(file) && File.socket?(file)
+  File.delete(file) if File.exist?(file) && File.socket?(file)
 end
