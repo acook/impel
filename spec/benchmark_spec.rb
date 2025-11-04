@@ -18,13 +18,16 @@ end
 def self.bench name, command
   output = nil
   print " -- #{name.ljust(11)} :"
-  print Benchmark.measure {
+  stats = Benchmark.measure {
     iterations.times do
       _, output = run command
     end
   }
   out = output.stdout.strip + output.stderr.strip
-  puts out unless out.empty?
+  puts stats unless out.include? 'command not found'
+  puts "\t#{out}" unless out.empty?
+rescue => err
+  puts err.full_message
 end
 
 Dir.mkdir './tmp' unless File.exist? './tmp'
