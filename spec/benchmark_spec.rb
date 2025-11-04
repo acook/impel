@@ -2,6 +2,7 @@ require_relative 'spec_helper'
 
 require 'benchmark'
 require 'socket'
+require 'tempfile'
 
 spec 'running benchmarks' do
   true
@@ -17,22 +18,23 @@ end
 
 def self.bench name, command
   output = nil
+  status = nil
   print " -- #{name.ljust(11)} :"
   stats = Benchmark.measure {
     iterations.times do
-      _, output = run command
+      status, output = run command
     end
   }
   out = output.stdout.strip + output.stderr.strip
-  puts stats unless out.include? 'command not found'
+  puts stats unless status.exitstatus != 0
   puts "\t#{out}" unless out.empty?
 rescue => err
   puts err.full_message
 end
 
-Dir.mkdir './tmp' unless File.exist? './tmp'
-file = './tmp/benchmark.sock'
-File.delete(file) if File.exist?(file) && File.socket?(file)
+temp = Tempfile.create
+file = temp.path
+File.unlink(file)
 
 server = UNIXServer.new(file)
 #socket = server.accept
@@ -41,7 +43,8 @@ begin
 
   bash_socket = <<-BASH_SOCKET
     bash -c "
-      exec 3<> ./tmp/benchmark.sock
+      set -e
+      exec 3<> #{file}
 
       exec 3<&-
       exec 3>&-
@@ -54,7 +57,7 @@ begin
     blacklight:  %q{blacklight -e '@'},
     lua:         %q{lua -e 'os.exit()'},
     bash:        %q{bash -c 'exit'},
-    #bash_socket: bash_socket,
+    bash_socket: bash_socket,
     perl:        %q{perl -e 'exit'},
     mruby:       %q{mruby -e 'Array.new'},
     python:      %q{python -c 'exit'},
@@ -73,5 +76,5 @@ begin
 
 ensure
   server.close
-  File.delete(file) if File.exist?(file) && File.socket?(file)
+  File.unlink(file)
 end
