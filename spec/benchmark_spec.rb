@@ -32,17 +32,21 @@ rescue => err
   puts err.full_message
 end
 
-def self.compile cc, source_file
+def self.compile cc, source_file, outflag = '-o '
   temp_binary = Tempfile.create
   temp_binary.close
-  compile_command = "#{cc} #{source_file} -o #{temp_binary.path}"
+  compile_command = "#{cc} #{outflag}#{temp_binary.path} #{source_file}"
   status, output = run compile_command
 
   p compile_command, output unless status.exitstatus == 0
+  $temp_files << source_file
+  $temp_files << temp_binary.path
+  $temp_files.uniq
   temp_binary.path
 end
 
-temp_files = Array.new
+$temp_files = Array.new
+
 temp_c_source = Tempfile.create ['', '.c']
 File.open(temp_c_source.path, 'w') do |f|
   f << <<~EOF
@@ -51,9 +55,7 @@ File.open(temp_c_source.path, 'w') do |f|
 end
 temp_clang = compile 'clang', temp_c_source.path
 temp_gcc = compile 'gcc', temp_c_source.path
-temp_files << temp_c_source.path
-temp_files << temp_clang
-temp_files << temp_gcc
+temp_c_zig = compile 'zig cc', temp_c_source.path
 
 temp_v_source = Tempfile.create ['', '.v']
 File.open(temp_v_source.path, 'w') do |f|
@@ -63,15 +65,44 @@ File.open(temp_v_source.path, 'w') do |f|
   EOF
 end
 temp_v = compile 'v', temp_v_source.path
-temp_files << temp_v_source.path
-temp_files << temp_v
+temp_v_gcc = compile 'v -cc gcc', temp_v_source.path
+temp_v_clang = compile 'v -cc clang', temp_v_source.path
+
+temp_go_source = Tempfile.create ['', '.go']
+File.open(temp_go_source.path, 'w') do |f|
+  f << <<~EOF
+    package main
+    import "os"
+    func main() {
+      os.Exit(0)
+    }
+  EOF
+end
+temp_go = compile 'go build', temp_go_source.path
+
+temp_zig_source = Tempfile.create ['', '.zig']
+File.open(temp_zig_source.path, 'w') do |f|
+  f << <<~EOF
+    const std = @import("std");
+    pub fn main() noreturn {
+        std.process.exit(0);
+    }
+  EOF
+end
+temp_zig = compile 'zig build-exe', temp_zig_source.path, '-femit-bin='
+run "chmod +x #{temp_zig}"
 
 begin
 
   interpreters = {
-    clang:       temp_clang,
-    gcc:         temp_gcc,
-    v:           temp_v,
+    zig:         temp_zig,
+    c_clang:     temp_clang,
+    c_gcc:       temp_gcc,
+    c_zig:       temp_c_zig,
+    v_tcc:       temp_v,
+    v_gcc:       temp_v_gcc,
+    v_clang:     temp_v_clang,
+    go:          temp_go,
     luajit:      %q{luajit -e 'os.exit()'},
     blacklight:  %q{blacklight -e '@'},
     lua:         %q{lua -e 'os.exit()'},
@@ -97,7 +128,12 @@ begin
   end
 
 ensure
-  temp_files.each do |f|
-    File.unlink f
+  $temp_files.each do |f|
+    begin
+      File.unlink f
+    rescue SystemCallError => err
+      msg = err.full_message
+      puts msg unless msg.include? 'No such file'
+    end
   end
 end
